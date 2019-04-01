@@ -12,69 +12,9 @@
 <!-- Load goodtables-ui so we can use it in the body of this page. -->
 <script src="https://unpkg.com/goodtables-ui@1.1.3/dist/goodtables-ui.min.js"></script>
 
-<!-- Premium data offer -->
-{% if owner|lower == 'core' or owner|lower == 'sports-data' or owner|lower == 'machine-learning' or owner|lower == 'cryptocurrency' or owner|lower == 's-and-p-500-financial-data' or owner|lower == 'world-bank' or owner|lower == 'unece' %}
-<div class="container">
-  <div class="inner_container">
-
-
-    <!-- Modal -->
-    <div class="modal-new modal fade" id="premium-data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h3 class="modal-title" id="myModalLabel"><img src="/static/img/text-msg.png" class="title-img"/> Premium data offer</h3>
-          </div>
-          <div class="modal-body">
-            <iframe src="/premium-data" width="100%" height="550px" frameborder="0"></iframe>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-    <!-- Bottom Area to show the alert -->
-    <div class="stripe-ribbon" id="showcase-offer">
-      <p>Now you can request additional data and/or customized columns! </p>
-      <a href="#premium-data" data-toggle="modal" data-target="#premium-data" class="premium-data-link" onclick="dataLayer.push({'premium-data-link': 'sticky-btm-bar'})">Try It Now!</a>
-    </div>
-
-{% endif %}<!-- End of Premium data offer -->
-
 <!-- title and owner info -->
 <div class="container">
   <div class="inner_container">
-    {% if owner|lower == 'core' and dataset.name|lower == 'euribor' %}
-    <div class="alert alert-info" role="alert" style="font-style: italic; font-size: 12px;">
-      The Euribor benchmark is created by the European Money Market Institude a.i.s.b.l. (EMMI). Euribor® is a registered trademark of EMMI. A licensing agreement with EMMI is mandatory for all commercial use of the registered trademark Euribor®. Datahub.io is not authorised by, licensed by or affiliated in any way with EMMI. EMMI declines all responsibility for the information on this website, including without limitation the completeness or the accuracy of the Euribor benchmark data.
-    </div>
-    {% endif %}
-
-    {% if status === 'FAILED' %}
-    <div class="alert alert-danger status" role="alert">
-      <h3 class="error-log-heading">Processing this revision has failed. See below for details:</h3>
-      {% for pipeline in failedPipelines %}
-        {% if not 'Dependency unsuccessful' in (pipeline.error_log[0] or '') and pipeline.error_log[0] %}
-        <p class="error-log-title" data-toggle="collapse" data-target="#pipeline-{{loop.index}}">{{pipeline.title}}</p>
-        <div id="pipeline-{{loop.index}}" class="collapse">
-          {% for error in pipeline.error_log %}
-            <p class="error-log">
-              {{error}}
-            </p>
-          {% endfor %}
-        </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    {% elif status === 'SUCCEEDED' %}
-    {% elif status %}
-    <div class="alert alert-info status" role="alert">
-      {{ snippets.uploading(statusApi, failUrl, successUrl, dataset.resources) }}
-    </div>
-    {% endif %}
 
     <!-- Show notice if any of reports is invalid -->
     {% if dataset.report and not dataset.report.valid %}
@@ -93,22 +33,8 @@
     <div class="showcase-page-header">
       <h1>
         {{ dataset.title or dataset.name }}
-        {% if dataset.datahub.findability === 'unlisted' %}
-        <span class="label label-primary" title="This dataset is not published yet.">unlisted</span>
-        {% elif dataset.datahub.findability === 'private' %}
-        <span class="label label-primary" title="This dataset is not published yet.">private</span>
-        {% endif %}
-
-        {% if certified %}
-            <!-- Certified -->
-            <div class="certified-tick" data-toggle="tooltip">
-              <p><img src="/static/img/certified.png" class="pull-left" /> Certified</p>
-            </div>
-            <!-- End of Certified -->
-        {% endif %}
       </h1>
 
-      
       <p class="clearfix"></p>
 
       <p class="publisher">
@@ -139,7 +65,7 @@
           <tbody>
             <tr>
               <td class="col-xs-1">{{ dataset.resources | length }}</td>
-              <td class="col-xs-1">{{ size }}</td>
+              <td class="col-xs-1">{{ size or 'N\A' }}</td>
               <td class="col-xs-2 format-list">
                 {% for format in dataset.formats %}
                   {{ format }}
@@ -594,17 +520,8 @@
   var DP_ID = JSON.parse('{{ dpId | safe }}');
 </script>
 
-{% if status === 'SUCCEEDED' %}
-  <link rel="stylesheet" media="screen" href="/static/dpr-js/dist/main.css">
-  <script type="text/javascript" src="/static/dpr-js/dist/bundle.js"></script>
-{% else %}
-  <script>
-    var views = document.getElementsByClassName('react-me');
-    for (var i=0; i<views.length; i++) {
-      views[i].innerHTML = "<div class='view-placeholder'>This view will be available once the dataset is processed.</div>"
-    }
-  </script>
-{% endif %}
+<link rel="stylesheet" media="screen" href="/static/dpr-js/dist/main.css">
+<script type="text/javascript" src="/static/dpr-js/dist/bundle.js"></script>
 
 
 {% endblock %}

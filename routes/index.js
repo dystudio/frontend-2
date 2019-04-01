@@ -155,142 +155,7 @@ module.exports = function () {
     '/download'
   ], redirectToDest('/tools'))
 
-  // ----------------------------
-  // Redirects from old datahub.io to new website
 
-  // Following paths to be redirected to new "/search" page
-  router.get([
-    '/dataset',
-    '/dataset?res_format=CSV',
-    '/es/dataset', '/it/dataset', '/fr/dataset', '/zh_CN/dataset'
-  ], redirectToDest('/search'))
-
-  // These should be redirected to new "/core" page
-  router.get([
-    '/organization/core',
-    '/dataset/core'
-  ], redirectToDest('/core'))
-
-  // Following variations of "iso-3166-1-alpha-2-country-codes" dataset should
-  // be redirected to new "country-list" dataset.
-  // There are number of variations due to language/country versions.
-  router.get([
-    '/dataset/iso-3166-1-alpha-2-country-codes',
-    '/dataset/iso-3166-1-alpha-2-country-codes/*',
-    '/*/dataset/iso-3166-1-alpha-2-country-codes',
-    '/*/dataset/iso-3166-1-alpha-2-country-codes/*'
-  ], redirectToDest('/core/country-list'))
-
-  // All requests related to "us-employment-bls" redirect to new "employment-us"
-  router.get([
-    '/dataset/us-employment-bls',
-    '/dataset/us-employment-bls/*',
-    '/*/dataset/us-employment-bls',
-    '/*/dataset/us-employment-bls/*'
-  ], redirectToDest('/core/employment-us'))
-
-  // All requests related to "iso-4217-currency-codes" redirect
-  // to new "currency-codes" dataset
-  router.get([
-    '/dataset/iso-4217-currency-codes',
-    '/dataset/iso-4217-currency-codes/*',
-    '/*/dataset/iso-4217-currency-codes',
-    '/*/dataset/iso-4217-currency-codes/*'
-  ], redirectToDest('/core/currency-codes'))
-
-  // "standard-and-poors-500-shiller" => "s-and-p-500" under core
-  router.get([
-    '/dataset/standard-and-poors-500-shiller',
-    '/dataset/standard-and-poors-500-shiller/*',
-    '/*/dataset/standard-and-poors-500-shiller',
-    '/*/dataset/standard-and-poors-500-shiller/*'
-  ], redirectToDest('/core/s-and-p-500'))
-
-  // "cofog" => "cofog" under core
-  router.get([
-    '/dataset/cofog',
-    '/dataset/cofog/*',
-    '/*/dataset/cofog',
-    '/*/dataset/cofog/*'
-  ], redirectToDest('/core/cofog'))
-
-  // same here
-  router.get([
-    '/dataset/gold-prices',
-    '/dataset/gold-prices/*',
-    '/*/dataset/gold-prices',
-    '/*/dataset/gold-prices/*'
-  ], redirectToDest('/core/gold-prices'))
-
-  // and here also
-  router.get([
-    '/dataset/imf-weo',
-    '/dataset/imf-weo/*',
-    '/*/dataset/imf-weo',
-    '/*/dataset/imf-weo/*'
-  ], redirectToDest('/core/imf-weo'))
-
-  // 'global-airport' 'open-flights' => 'airport-codes'
-  router.get(['/dataset/global-airports', '/dataset/open-flights'], redirectToDest('/core/airport-codes'))
-
-  // 'dblp' => '/awesome/bibliographic-data'
-  router.get('/dataset/dblp', redirectToDest('/awesome/bibliographic-data'))
-
-  // 'yago' => `/awesome/yago`
-  router.get('/dataset/yago', redirectToDest('/awesome/yago'))
-
-  // 'opencorporates' => '/awesome/opencorporates'
-  router.get('/dataset/opencorporates', redirectToDest('/awesome/opencorporates'))
-
-  // '/dataset/freebase' => '/awesome/linked-open-data#freebase'
-  router.get('/dataset/freebase', redirectToDest('/awesome/linked-open-data#freebase'))
-
-  // '/dataset/atp-wta-professional-tennis-tournament-data' => '/sports-data/atp-world-tour-tennis-data'
-  router.get('/dataset/atp-wta-professional-tennis-tournament-data', redirectToDest('/sports-data/atp-world-tour-tennis-data'))
-
-  // '/dataset/fifa-world-cup-2014-all-players' => '/awesome/football'
-  router.get('/dataset/fifa-world-cup-2014-all-players', redirectToDest('/awesome/football'))
-
-  // '/dataset/imdb' => '/awesome/movies-and-tv'
-  router.get('/dataset/imdb', redirectToDest('/awesome/movies-and-tv'))
-
-  // '/dataset/exchange-rates' => '/core/exchange-rates'
-  router.get('/dataset/exchange-rates', redirectToDest('/core/exchange-rates'))
-
-  // Finally, redirections for login and dashboard pages
-  router.get('/user/login', redirectToDest('/login'))
-  router.get(['/dashboard/datasets', '/dashboard/groups'], redirectToDest('/dashboard'))
-
-  // ----------------------------
-  // Redirects for old.datahub.io
-  //
-  // come first to avoid any risk of conflict with /:owner or /:owner/:dataset
-
-  function redirect(path, base='https://old.datahub.io') {
-    return (req, res) => {
-      let dest = base + path;
-      if (req.params[0] && Object.keys(req.query).length > 0) {
-        let queryString = '?' + req.url.split('?')[1]
-        dest += '/' + req.params[0] + queryString
-      } else if (req.params[0]) {
-        dest += '/' + req.params[0]
-      }
-      res.redirect(302, dest);
-    }
-  }
-  const redirectPaths = [
-    '/organization',
-    '/api',
-    '/dataset',
-    '/user',
-    '/tag'
-  ]
-  for(let offset of redirectPaths) {
-    router.get([offset, offset+'/*'], redirect(offset))
-  }
-
-  // /end redirects
-  // -------------
 
   router.get('/dashboard', async (req, res, next) => {
     if (req.cookies.jwt) {
@@ -539,244 +404,57 @@ module.exports = function () {
   // ===== /end blog
 
   // Function for rendering showcase page:
-  function renderShowcase(revision) {
+  function renderShowcase() {
     return async (req, res, next) => {
       // Sometimes we're getting situation when owner is undefined, we want to return in such situations:
       if (!req.params.owner) return
       let token = req.cookies.jwt ? req.cookies.jwt : req.query.jwt
-      // Hit the resolver to get userid and packageid:
-      const userAndPkgId = await api.resolve(
-        slash(path.join(req.params.owner, req.params.name))
-      )
-      // If specStoreStatus API does not respond within 10 sec,
-      // then proceed to error handler and show 500:
-      const timeoutObj = setTimeout(() => {
-        next(`status api timed out for ${req.params.owner}/${req.params.name}`)
-        return
-      }, 10000)
 
-      // Get the latest successful revision, if does not exist show 404
-      let revisionStatus
+      let normalizedDp = null
+      let failedPipelines = []
+
       try {
-        revisionStatus = await api.specStoreStatus(
-          userAndPkgId.userid,
-          userAndPkgId.packageid,
-          revision ? revision : req.params.revisionId
-        )
-        clearTimeout(timeoutObj)
+        normalizedDp = await api.getPackage(req.params.owner, req.params.name, token)
       } catch (err) {
         next(err)
         return
       }
 
-      // Get the "normalizedDp" depending on revision status:
-      let normalizedDp = null
-      let failedPipelines = []
-      // Id is in `userid/dataset/id` form so we need the latest part:
-      const revisionId = revisionStatus.id.split('/')[2]
-
-      if (revisionStatus.state === 'SUCCEEDED') { // Get it normally
-        try {
-          normalizedDp = await api.getPackage(userAndPkgId.userid, userAndPkgId.packageid, revisionId, token)
-        } catch (err) {
-          next(err)
-          return
+      // Since "frontend-showcase-js" library renders views according to
+      // descriptor's "views" property, we need to include "preview" views:
+      normalizedDp.views = normalizedDp.views || []
+      normalizedDp.resources.forEach(resource => {
+        const view = {
+          datahub: {
+            type: 'preview'
+          },
+          resources: [
+             resource.name
+          ],
+          specType: 'table'
         }
-      } else {
-        if (revisionStatus.state === 'FAILED') { // Use original dp and collect failed pipelines
-          normalizedDp = revisionStatus.spec_contents.inputs[0].parameters.descriptor
-          for (let key in revisionStatus.pipelines) {
-            if (revisionStatus.pipelines[key].status === 'FAILED') {
-              failedPipelines.push(revisionStatus.pipelines[key])
-            } else if (revisionStatus.pipelines[key].status === 'SUCCEEDED' && key.includes('validation_report')) {
-              // As "validation_report" pipeline SUCCEEDED, we can get reports:
-              let report = await fetch(revisionStatus.pipelines[key].stats['.dpp']['out-datapackage-url'])
-              if (report.status === 403) {
-                try {
-                  const signedUrl = await api.checkForSignedUrl(
-                    revisionStatus.pipelines[key].stats['.dpp']['out-datapackage-url'],
-                    userAndPkgId.userid,
-                    token
-                  )
-                  let res = await fetch(signedUrl.url)
-                  report = await res.json()
-                } catch (err) {
-                  next(err)
-                  return
-                }
-              } else if (report.status === 200) {
-                report = await report.json()
-              }
-              normalizedDp.report = report.resources[0]
-              normalizedDp = await api.handleReport(normalizedDp, {
-                ownerid: userAndPkgId.userid,
-                name: userAndPkgId.packageid,
-                token
-              })
-            }
-          }
-        } else if (['INPROGRESS', 'QUEUED'].includes(revisionStatus.state)) {
-          // We don't want to show showcase page from original dp if dataset is
-          // private. If so compare userid with hash of user email from cookies:
-          // Also compare userid with owner (in case of custom ID Eg core)
-          // TODO: we should probably have API for it.
-          const emailHash = req.cookies.email ? md5(req.cookies.email) : ''
-          if (userAndPkgId.userid !== emailHash && userAndPkgId.userid !== req.params.owner) {
-            res.status(404).render('404.html', {
-              message: 'Sorry, this page was not found',
-              comment: 'You might need to Login to access more datasets'
-            })
-            return
-          }
-          // Only if above stuff is passed we use original dp:
-          normalizedDp = revisionStatus.spec_contents.inputs[0].parameters.descriptor
-        }
+        normalizedDp.views.push(view)
+      })
+      console.log(normalizedDp.views)
 
-        // When we use original dp.json, "path" for a "resource" can be relative
-        // but to be able to render views using that "resource" we need full URL
-        // of it. We can access full URLs from "resource-mapping" property in the
-        // source API's spec_contents and replace relative paths with it:
-        normalizedDp.resources.forEach(resource => {
-          const pathParts = urllib.parse(resource.path)
-          if (!pathParts.protocol) {
-            const remotePath = revisionStatus.spec_contents.inputs[0].parameters['resource-mapping'][resource.path]
-            resource.path = remotePath || resource.path
-          }
-        })
-        // Since "frontend-showcase-js" library renders views according to
-        // descriptor's "views" property, we need to include "preview" views:
-        // (in the SUCCEEDED revisions "preview" views are generated)
-        normalizedDp.views = normalizedDp.views || []
-        normalizedDp.resources.forEach(resource => {
-          const view = {
-            datahub: {
-              type: 'preview'
-            },
-            resources: [
-               resource.name
-            ],
-            specType: 'table'
-          }
-          normalizedDp.views.push(view)
-        })
+      renderPage(normalizedDp)
 
-        // When we use original dp.json, we only have "readme" property. In the
-        // showcase page we use "readmeSnippet" property to display short readme
-        // in the top of the page and "readmeHtml" property to render full readme:
-        if (normalizedDp.readme) {
-          normalizedDp.readmeSnippet = utils.makeSmallReadme(normalizedDp.readme)
-          const readmeCompiled = utils.dpInReadme(normalizedDp.readme, normalizedDp)
-          normalizedDp.readmeHtml = utils.textToMarkdown(readmeCompiled)
-        }
-      }
-
-      renderPage(revisionStatus, revision ? true : false)
-
-      async function renderPage(status, shortUrl) {
-        // Check if it's a private dataset and sign urls if so:
-        if (status.spec_contents.meta.findability === 'private') {
-          const authzToken = await api.authz(token)
-          await Promise.all(normalizedDp.resources.map(async resource => {
-            const pathParts = urllib.parse(resource.path)
-            if (!pathParts.protocol) {
-              resource.path = urllib.resolve(
-                config.get('BITSTORE_URL'),
-                [userAndPkgId.userid, userAndPkgId.packageid, resource.name, resource.path].join('/')
-              )
-            }
-            let response = await fetch(resource.path)
-            if (response.status === 403) {
-              const signedUrl = await api.checkForSignedUrl(
-                resource.path,
-                userAndPkgId.userid,
-                null,
-                authzToken
-              )
-              resource.path = signedUrl.url
-            }
-            if (resource.alternates) {
-              const previewResource = resource.alternates.find(res => res.datahub.type === 'derived/preview')
-              if (previewResource) {
-                const pathParts = urllib.parse(previewResource.path)
-                if (!pathParts.protocol) {
-                  previewResource.path = urllib.resolve(
-                    config.get('BITSTORE_URL'),
-                    [userAndPkgId.userid, userAndPkgId.packageid, previewResource.name, previewResource.path].join('/')
-                  )
-                }
-                let response = await fetch(previewResource.path)
-                if (response.status === 403) {
-                  const signedUrl = await api.checkForSignedUrl(
-                    previewResource.path,
-                    userAndPkgId.userid,
-                    null,
-                    authzToken
-                  )
-                  previewResource.path = signedUrl.url
-                }
-              }
-            }
-          }))
-        }
-
-        // Get size of this revision:
-        const [owner, name, revision] = status.id.split('/')
-        let storage
-        try {
-          storage = await api.getStorage({owner, pkgId: name, flowId: revision})
-        } catch (err) {
-          // Log the error but continue loading the page without storage info
-          console.error(err)
-        }
-
-        // Get the seo object from the dict:
-        let seoDict = keywords
-          .find(item => item.name === req.params.name)
-        let metaDescription, datasetKeywords = ''
-        if (seoDict) {
-          // Get the general meta description:
-          const generalMetaDescription = keywords
-            .find(item => item.name === 'general')
-            .description
-          // Get the descriptions for popular datasets:
-          metaDescription = seoDict.description + ' ' + generalMetaDescription
-          // Get the keywords:
-          datasetKeywords = seoDict.keywords.join(',')
-          // Add keywords to README:
-          normalizedDp.readmeHtml += `\n<hr>Keywords and keyphrases: ${datasetKeywords.replace(/,/g, ', ')}.`
-        }
-
-        // Get the common keywords:
-        const generalKeywords = keywords
-          .find(item => item.name === 'general')
-          .keywords
-          .join(',')
-
+      async function renderPage(dp) {
         // Check if views are available so we can set meta image tags:
         let metaImage
         if (normalizedDp.resources.length <= normalizedDp.views.length) {
           // This means views have regular views on top of preview views:
-          metaImage = `https://datahub.io/${req.params.owner}/${normalizedDp.name}/view/0.png`
+          metaImage = `${config.get('SITE_URL')}/${req.params.owner}/${normalizedDp.name}/view/0.png`
         }
 
         // Now render the page:
         res.render('showcase.html', {
           title: req.params.owner + ' | ' + req.params.name,
-          dataset: normalizedDp,
+          dataset: dp,
           owner: req.params.owner,
-          size: storage ? bytes(storage.totalBytes, {decimalPlaces: 0}) : 'N/A',
           // eslint-disable-next-line no-useless-escape, quotes
-          dpId: JSON.stringify(normalizedDp).replace(/\\/g, '\\\\').replace(/\'/g, "\\'"),
-          status: status.state,
-          failUrl: `/${req.params.owner}/${req.params.name}/v/${revisionId}`,
-          successUrl: `/${req.params.owner}/${req.params.name}`,
-          statusApi: `${config.get('API_URL')}/source/${userAndPkgId.userid}/${userAndPkgId.packageid}/${revisionId}`,
-          revisionId: shortUrl ? null : revisionId,
-          failedPipelines,
-          keywords: datasetKeywords + generalKeywords,
-          metaDescription,
-          metaImage,
-          certified: revisionStatus.certified
+          dpId: JSON.stringify(dp).replace(/\\/g, '\\\\').replace(/\'/g, "\\'"),
+          metaImage
         })
       }
     }
@@ -803,67 +481,7 @@ module.exports = function () {
     })
   })
 
-  router.get('/:owner/:name', renderShowcase('successful'))
-  router.get('/:owner/:name/v/:revisionId', renderShowcase())
-
-  router.get('/:owner/:name/datapackage.json', async (req, res, next) => {
-    let normalizedDp = null
-    let token = req.cookies.jwt ? req.cookies.jwt : req.query.jwt
-    const userAndPkgId = await api.resolve(
-      slash(path.join(req.params.owner, req.params.name))
-    )
-    if (!userAndPkgId.userid) {
-      res.status(404).render('404.html', {
-        message: 'Sorry, this page was not found',
-        comment: 'You might need to Login to access more datasets'
-      })
-      return
-    }
-
-    // Get the specific revision if id is given,
-    // if not get the latest successful revision, if does not exist show 404
-    let revisionId = req.query.v
-    if (!revisionId) {
-      let revisionStatus
-      try {
-        revisionStatus = await api.specStoreStatus(
-          userAndPkgId.userid,
-          userAndPkgId.packageid,
-          'successful'
-        )
-      } catch (err) {
-        next(err)
-        return
-      }
-      revisionId = revisionStatus.id.split('/')[2]
-    }
-
-    try {
-      normalizedDp = await api.getPackage(userAndPkgId.userid, userAndPkgId.packageid, revisionId, token)
-    } catch (err) {
-      next(err)
-      return
-    }
-    let redirectUrl = `${normalizedDp.path}/datapackage.json`
-    let resp = await fetch(redirectUrl)
-    // After changes in pkgstore, we ended up with some datasets that cannot be
-    // accessed by its revision id unless its revision re-triggered. In such
-    // cases we can access datapackage.json by using 'latest' string instead of
-    // revision id:
-    if (resp.status === 404) {
-      redirectUrl = redirectUrl.replace(`/${revisionId}/`, '/latest/')
-    }
-    if (normalizedDp.datahub.findability === 'private') {
-      const authzToken = await api.authz(token)
-      if (resp.status === 403) {
-        const signedUrl = await api.checkForSignedUrl(
-          redirectUrl, userAndPkgId.userid, null, authzToken
-        )
-        redirectUrl = signedUrl.url
-      }
-    }
-    res.redirect(redirectUrl)
-  })
+  router.get('/:owner/:name', renderShowcase())
 
   router.get('/:owner/:name/r/:fileNameOrIndex', async (req, res, next) => {
     let normalizedDp = null
