@@ -624,65 +624,6 @@ and managers can help you to design, build or enhance your data project.</p>
 {% endblock %}
 
 {% block scripts %}
-<!-- script for animation of terminal -->
-<script>
-  var TxtRotate = function(el, text, start) {
-    this.text = text;
-    this.el = el;
-    this.delay = parseInt(start);
-    this.txt = '';
-    var that = this;
-    setTimeout(function(){
-      that.tick();
-    }, that.delay);
-  };
-
-  TxtRotate.prototype.tick = function() {
-    var prompts = document.getElementsByClassName('prompt');
-    var cursors = document.getElementsByClassName('cursor');
-    var fullTxt = this.text;
-
-    this.txt = fullTxt.substring(0, this.txt.length + 1);
-
-    this.el.innerHTML = '<span class="wrap">'+this.txt+'</span>';
-
-    var that = this;
-    var delta = 300 - Math.random() * 100;
-
-    setTimeout(function() {
-      that.tick();
-    }, delta);
-
-    setTimeout(function() {
-      if (that.txt === fullTxt) {
-        var outputs = document.getElementsByClassName('output')
-        if (fullTxt === 'ls') {
-          cursors[0].style.display = 'none';
-          outputs[0].style.display = 'block';
-          prompts[1].style.display = 'block';
-        } else if (fullTxt === 'data push data.csv') {
-          cursors[1].style.display = 'none';
-          prompts[2].style.display = 'block';
-        } else if (fullTxt.includes('...')) {
-          outputs[1].style.display = 'inline-block';
-          outputs[2].style.display = 'block';
-          prompts[3].style.display = 'block';
-        }
-      }
-    }, 2000);
-  };
-
-  window.onload = function() {
-    var elements = document.getElementsByClassName('txt-show');
-    for (var i=0; i<elements.length; i++) {
-      var start = elements[i].getAttribute('data-start');
-      var text = elements[i].getAttribute('data-text');
-      if (text) {
-        new TxtRotate(elements[i], text, start);
-      }
-    }
-  };
-</script>
 <script>
     $(document).ready(function(){
       // Add smooth scrolling to all links
