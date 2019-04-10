@@ -6,470 +6,471 @@
 {{dataset.title or dataset.name}} - Dataset
 {% endblock %}
 
-{% block bodyclass %}showcase{% endblock %}
 
 {% block content %}
 <!-- Load goodtables-ui so we can use it in the body of this page. -->
 <script src="https://unpkg.com/goodtables-ui@1.1.3/dist/goodtables-ui.min.js"></script>
 
 <!-- title and owner info -->
-<div class="container">
-  <div class="inner_container">
+<div role="main">
+  <div class="container showcase">
+    <div class="inner_container">
 
-    <!-- Show notice if any of reports is invalid -->
-    {% if dataset.report and not dataset.report.valid %}
-    <div class="alert alert-danger status" role="alert">
-      <h3 class="error-log-heading">Some of your data has validation errors:</h3>
-      {% for resource in dataset.resources %}
-      {% if resource.reportObj and not resource.reportObj.valid %}
-      <p>
-        - <a href="#report-{{loop.index - 1}}">{{ resource.reportObj.resource }}</a>: {{ resource.reportObj['error-count'] }} error(s) found.
-      </p>
-      {% endif %}
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="showcase-page-header">
-      <h1>
-        {{ dataset.title or dataset.name }}
-      </h1>
-
-      <p class="clearfix"></p>
-
-      <p class="publisher">
-        <img src="https://www.gravatar.com/avatar/{{ dataset.datahub.ownerid }}?d=https%3A%2F%2Ftesting.datahub.io%2Fstatic%2Fimg%2Flogo-cube03.png" class="img-responsive img-circle avatar" />
-        <a href="/{{ owner }}">{{ owner }}</a>
-      </p>
-    </div>
-  </div>
-</div><!-- end of title and owner info -->
-
-<div class="container-no-top-padding">
-  <div class="inner_container">
-    <div class="dataset show">
-      <!-- info about data package -->
-      <div>
-        <table class="table info no-left-padding">
-          <thead>
-            <tr>
-              <th>Files</th>
-              <th>Size</th>
-              <th>Format</th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>License</th>
-              <th>Source</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="col-xs-1">{{ dataset.resources | length }}</td>
-              <td class="col-xs-1">{{ size or 'N\A' }}</td>
-              <td class="col-xs-2 format-list">
-                {% for format in dataset.formats %}
-                  {{ format }}
-                {% endfor %}
-              </td>
-              <td class="col-xs-2">{{ dataset.datahub.created }}</td>
-              <td class="col-xs-2">{{ dataset.datahub.modified }}</td>
-              <td class="col-xs-2">
-                {% if dataset.licenses %}
-                  <i class="fas fa-gavel"></i> {{snippets.listify(dataset.licenses)}}
-                {% elif dataset.license %}
-                  <i class="fas fa-gavel"></i> <span title="{{ dataset.license }}">{{ dataset.license }}</span>
-                {% endif %}
-              </td>
-              <td class="col-xs-2">
-                {% if dataset.sources %}
-                  <i class="fas fa-external-link-square-alt"></i> {{snippets.listify(dataset.sources)}}
-                {% endif %}
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
-
-      </div>
-
-      <!-- short readme -->
-      {% if dataset.readmeSnippet %}
-        <div class="readme-snippet readable-width">{{dataset.readmeSnippet}} <a href="#readme" onclick="scrollDown(this)">read more</a></div>
-      {% elif dataset.readmeHtml %}
-        <div class="readme-snippet readable-width">{{dataset.readmeHtml|safe}}</div>
-      {% elif dataset.description %}
-        {% if dataset.description|length > 250 %}
-          <div class="readme-snippet readable-width">{{dataset.description|truncate(200)}} <a href="#readme" onclick="scrollDown(this)">read more</a></div>
-        {% else %}
-          <div class="readme-snippet readable-width">{{dataset.description}}</div>
+      <!-- Show notice if any of reports is invalid -->
+      {% if dataset.report and not dataset.report.valid %}
+      <div class="alert alert-danger status" role="alert">
+        <h3 class="error-log-heading">Some of your data has validation errors:</h3>
+        {% for resource in dataset.resources %}
+        {% if resource.reportObj and not resource.reportObj.valid %}
+        <p>
+          - <a href="#report-{{loop.index - 1}}">{{ resource.reportObj.resource }}</a>: {{ resource.reportObj['error-count'] }} error(s) found.
+        </p>
         {% endif %}
+        {% endfor %}
+      </div>
       {% endif %}
 
-      <!-- download button -->
-      <a href="#data" class="btn btn-lg btn-primary" onclick="scrollDown(this)">Download</a>
-      <!-- developers button -->
-      <a href="#data-cli" class="btn btn-lg btn-default" onclick="scrollDown(this)">Developers</a>
+      <div class="showcase-page-header">
+        <h1>
+          {{ dataset.title or dataset.name }}
+        </h1>
 
-      <!-- views -->
-      <div class="react-me part" data-type="data-views" id="next-section"></div>
+        <p class="clearfix"></p>
 
-      <!-- data files (downloads) table -->
-      <h2 class="section-title" id="data">Data Files</h2>
-      <p>Download files in this dataset</p>
-      <div class="resource-listing part">
-        <table class="table table-condensed table-striped resource-listing">
-          <thead>
-            <th class="col-xs-2">File</th>
-            <th class="col-xs-4">Description</th>
-            <th class="col-xs-1">Size</th>
-            <th class="col-xs-2">Last changed</th>
-            <th class="col-xs-4">Download</th>
-          </thead>
-          <tbody>
-          {% for resource in dataset.downloads %}
-            <tr>
-              <td class="col-xs-2">
-                <i class="far fa-file-alt"></i> <a href="#resource-{{resource.name}}" onclick="scrollDown(this)" class="anchor-link" title="{{resource.title or resource.name}}">{{resource.name}}</a>
-              </td>
-              <td class="col-xs-4" title="{{ resource.description or resource.title }}">
-                {{ resource.description or resource.title }}
-              </td>
-              <td class="col-xs-1" title="{{ resource.prettyBytes }}">
-                {{ resource.prettyBytes }}
-              </td>
-              <td class="col-xs-1" title="{{ resource.modified }}">
-                {{ resource.modified }}
-              </td>
-              <td class="download truncate col-xs-4">
-                <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">
-                  {{ resource.format }} ({{resource.prettyBytes}})
-                </a>
-                {% for alt in resource.otherFormats %}
-                ,
-                <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ alt.format }}{{ '?v='+revisionId if revisionId }}">
-                  {{alt.format}} ({{alt.prettyBytes}})
-                </a>
-                {% endfor %}
-              </td>
-            </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+        <p class="publisher">
+          <img src="https://www.gravatar.com/avatar/{{ dataset.datahub.ownerid }}?d=https%3A%2F%2Ftesting.datahub.io%2Fstatic%2Fimg%2Flogo-cube03.png" class="img-responsive img-circle avatar" />
+          <a href="/{{ owner }}">{{ owner }}</a>
+        </p>
       </div>
+    </div>
+  </div><!-- end of title and owner info -->
 
-      <!-- preview + field information -->
-      {% for resource in dataset.resources %}
-      {% if resource.format !== 'zip' %}
-      <div class="resource-info part">
-        <!-- Heading for each resource -->
-        <h2 id="resource-{{resource.name}}" class="section-title">
-          {% if resource.title %}
-          {{resource.title}} [{{resource.name}}]
-          {% else %}
-          {{resource.name}}
-          {% endif %}
-          &nbsp;
-          <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">
-            <i class="far fa-arrow-alt-circle-down" aria-hidden="true" style="font-size:0.9em"></i>
-          </a>
-        </h2>
-        <!-- Render validation reports for each resource: -->
-        <div id="report-{{loop.index - 1}}"></div>
+  <div class="container-no-top-padding">
+    <div class="inner_container">
+      <div class="dataset show">
+        <!-- info about data package -->
+        <div>
+          <table class="table info no-left-padding">
+            <thead>
+              <tr>
+                <th>Files</th>
+                <th>Size</th>
+                <th>Format</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>License</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-xs-1">{{ dataset.resources | length }}</td>
+                <td class="col-xs-1">{{ size or 'N\A' }}</td>
+                <td class="col-xs-2 format-list">
+                  {% for format in dataset.formats %}
+                    {{ format }}
+                  {% endfor %}
+                </td>
+                <td class="col-xs-2">{{ dataset.datahub.created }}</td>
+                <td class="col-xs-2">{{ dataset.datahub.modified }}</td>
+                <td class="col-xs-2">
+                  {% if dataset.licenses %}
+                    <i class="fas fa-gavel"></i> {{snippets.listify(dataset.licenses)}}
+                  {% elif dataset.license %}
+                    <i class="fas fa-gavel"></i> <span title="{{ dataset.license }}">{{ dataset.license }}</span>
+                  {% endif %}
+                </td>
+                <td class="col-xs-2">
+                  {% if dataset.sources %}
+                    <i class="fas fa-external-link-square-alt"></i> {{snippets.listify(dataset.sources)}}
+                  {% endif %}
+                </td>
+              </tr>
+            </tbody>
 
-        <script>
-          if ('{{resource.report}}') {
-            var report = JSON.parse(`{{ resource.report | dump | safe }}`);
-            report = JSON.parse(report);
-            var element = document.getElementById('report-{{loop.index - 1}}');
-            goodtablesUI.render(goodtablesUI.Report, {report}, element);
-          }
-          // Hide message about "goodtable.yml"
-          var errorDetailsLinks = document.getElementsByClassName('error-details-link');
-          for (var i=0; i<errorDetailsLinks.length; i++) {
-            errorDetailsLinks[i].onclick = function () {
-              setTimeout(function () {
-                var liTags = document.getElementsByTagName('li');
-                for (var i=0; i<liTags.length; i++) {
-                  if (liTags[i].textContent.includes('check in goodtables.yml')) {
-                    liTags[i].style.display = 'none';
-                  }
-                }
-              }, 10)
-            }
-          }
-        </script>
-        <!-- End of reports rendering -->
+          </table>
 
-        <!-- Premium Data Offer Link -->
-        {% if owner|lower == 'core' or owner|lower == 'sports-data' or owner|lower == 'machine-learning' or owner|lower == 'cryptocurrency' or owner|lower == 's-and-p-500-financial-data' or owner|lower == 'world-bank' or owner|lower == 'unece' %}
-        <div class="data-offer-txt">
-            <img src="/static/img/cube.png" />
-            <p> Signup to Premium Service for additional or customised data - <a href="#premium-data-2" data-toggle="modal" data-target="#premium-data" class="premium-data-link" onclick="dataLayer.push({'premium-data-link': 'inline-msg'})">Get Started</a></p>
         </div>
+
+        <!-- short readme -->
+        {% if dataset.readmeSnippet %}
+          <div class="readme-snippet readable-width">{{dataset.readmeSnippet}} <a href="#readme" onclick="scrollDown(this)">read more</a></div>
+        {% elif dataset.readmeHtml %}
+          <div class="readme-snippet readable-width">{{dataset.readmeHtml|safe}}</div>
+        {% elif dataset.description %}
+          {% if dataset.description|length > 250 %}
+            <div class="readme-snippet readable-width">{{dataset.description|truncate(200)}} <a href="#readme" onclick="scrollDown(this)">read more</a></div>
+          {% else %}
+            <div class="readme-snippet readable-width">{{dataset.description}}</div>
+          {% endif %}
         {% endif %}
 
+        <!-- download button -->
+        <a href="#data" class="btn btn-lg btn-primary" onclick="scrollDown(this)">Download</a>
+        <!-- developers button -->
+        <a href="#data-cli" class="btn btn-lg btn-default" onclick="scrollDown(this)">Developers</a>
+
+        <!-- views -->
+        <div class="react-me part" data-type="data-views" id="next-section"></div>
+
+        <!-- data files (downloads) table -->
+        <h2 class="section-title" id="data">Data Files</h2>
+        <p>Download files in this dataset</p>
+        <div class="resource-listing part">
+          <table class="table table-condensed table-striped resource-listing">
+            <thead>
+              <th class="col-xs-2">File</th>
+              <th class="col-xs-4">Description</th>
+              <th class="col-xs-1">Size</th>
+              <th class="col-xs-2">Last changed</th>
+              <th class="col-xs-4">Download</th>
+            </thead>
+            <tbody>
+            {% for resource in dataset.downloads %}
+              <tr>
+                <td class="col-xs-2">
+                  <i class="far fa-file-alt"></i> <a href="#resource-{{resource.name}}" onclick="scrollDown(this)" class="anchor-link" title="{{resource.title or resource.name}}">{{resource.name}}</a>
+                </td>
+                <td class="col-xs-4" title="{{ resource.description or resource.title }}">
+                  {{ resource.description or resource.title }}
+                </td>
+                <td class="col-xs-1" title="{{ resource.prettyBytes }}">
+                  {{ resource.prettyBytes }}
+                </td>
+                <td class="col-xs-1" title="{{ resource.modified }}">
+                  {{ resource.modified }}
+                </td>
+                <td class="download truncate col-xs-4">
+                  <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">
+                    {{ resource.format }} ({{resource.prettyBytes}})
+                  </a>
+                  {% for alt in resource.otherFormats %}
+                  ,
+                  <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ alt.format }}{{ '?v='+revisionId if revisionId }}">
+                    {{alt.format}} ({{alt.prettyBytes}})
+                  </a>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- preview + field information -->
+        {% for resource in dataset.resources %}
+        {% if resource.format !== 'zip' %}
+        <div class="resource-info part">
+          <!-- Heading for each resource -->
+          <h2 id="resource-{{resource.name}}" class="section-title">
+            {% if resource.title %}
+            {{resource.title}} [{{resource.name}}]
+            {% else %}
+            {{resource.name}}
+            {% endif %}
+            &nbsp;
+            <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">
+              <i class="far fa-arrow-alt-circle-down" aria-hidden="true" style="font-size:0.9em"></i>
+            </a>
+          </h2>
+          <!-- Render validation reports for each resource: -->
+          <div id="report-{{loop.index - 1}}"></div>
+
+          <script>
+            if ('{{resource.report}}') {
+              var report = JSON.parse(`{{ resource.report | dump | safe }}`);
+              report = JSON.parse(report);
+              var element = document.getElementById('report-{{loop.index - 1}}');
+              goodtablesUI.render(goodtablesUI.Report, {report}, element);
+            }
+            // Hide message about "goodtable.yml"
+            var errorDetailsLinks = document.getElementsByClassName('error-details-link');
+            for (var i=0; i<errorDetailsLinks.length; i++) {
+              errorDetailsLinks[i].onclick = function () {
+                setTimeout(function () {
+                  var liTags = document.getElementsByTagName('li');
+                  for (var i=0; i<liTags.length; i++) {
+                    if (liTags[i].textContent.includes('check in goodtables.yml')) {
+                      liTags[i].style.display = 'none';
+                    }
+                  }
+                }, 10)
+              }
+            }
+          </script>
+          <!-- End of reports rendering -->
+
+          <!-- Premium Data Offer Link -->
+          {% if owner|lower == 'core' or owner|lower == 'sports-data' or owner|lower == 'machine-learning' or owner|lower == 'cryptocurrency' or owner|lower == 's-and-p-500-financial-data' or owner|lower == 'world-bank' or owner|lower == 'unece' %}
+          <div class="data-offer-txt">
+              <img src="/static/img/cube.png" />
+              <p> Signup to Premium Service for additional or customised data - <a href="#premium-data-2" data-toggle="modal" data-target="#premium-data" class="premium-data-link" onclick="dataLayer.push({'premium-data-link': 'inline-msg'})">Get Started</a></p>
+          </div>
+          {% endif %}
+
+          <!-- Placeholder div elements for React components: preview tables -->
+          <div id="resource-{{loop.index - 1}}" class="react-me tables"
+               data-type="resource-preview" data-resource="{{ loop.index - 1 }}"></div>
+          <!-- End of div elements for React -->
+          <p class="notice">
+            This is a preview version. There might be more data in <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">the original version.</a>
+          </p>
+          {% if resource.format == "csv" %}
+           <h3 class="section-title">Field information</h3>
+           <table class="table table-bordered table-striped resource-summary">
+             <thead>
+               <tr>
+                 <th>Field Name</th>
+                 <th>Order</th>
+                 <th>Type (Format)</th>
+                 <th>Description</th>
+               </tr>
+             </thead>
+             <tbody>
+               {% for field in resource.schema.fields %}
+               <tr>
+                 <th>{{field.name}}</th>
+                 <td>{{loop.index}}</td>
+                 <td class="type type-{{field.type}}">{{field.type}} {% if field.format %}({{field.format}}) {% endif %}</td>
+                 <td>{{field.description}}</td>
+               </tr>
+               {% endfor %}
+             </tbody>
+           </table>
+         {% endif %}
+        </div>
+        {% else %}
         <!-- Placeholder div elements for React components: preview tables -->
         <div id="resource-{{loop.index - 1}}" class="react-me tables"
              data-type="resource-preview" data-resource="{{ loop.index - 1 }}"></div>
         <!-- End of div elements for React -->
-        <p class="notice">
-          This is a preview version. There might be more data in <a href="/{{ owner }}/{{ dataset.name }}/r/{{ resource.name }}.{{ resource.format }}{{ '?v='+revisionId if revisionId }}">the original version.</a>
-        </p>
-        {% if resource.format == "csv" %}
-         <h3 class="section-title">Field information</h3>
-         <table class="table table-bordered table-striped resource-summary">
-           <thead>
-             <tr>
-               <th>Field Name</th>
-               <th>Order</th>
-               <th>Type (Format)</th>
-               <th>Description</th>
-             </tr>
-           </thead>
-           <tbody>
-             {% for field in resource.schema.fields %}
-             <tr>
-               <th>{{field.name}}</th>
-               <td>{{loop.index}}</td>
-               <td class="type type-{{field.type}}">{{field.type}} {% if field.format %}({{field.format}}) {% endif %}</td>
-               <td>{{field.description}}</td>
-             </tr>
-             {% endfor %}
-           </tbody>
-         </table>
-       {% endif %}
-      </div>
-      {% else %}
-      <!-- Placeholder div elements for React components: preview tables -->
-      <div id="resource-{{loop.index - 1}}" class="react-me tables"
-           data-type="resource-preview" data-resource="{{ loop.index - 1 }}"></div>
-      <!-- End of div elements for React -->
-      {% endif %}
-      {% endfor %}
+        {% endif %}
+        {% endfor %}
 
-      <!-- Similar datasets -->
-      {% if dataset.related %}
-        <h2 class="section-title">Similar Datasets</h2>
-        <section class="similar-datasets">
-          <div class="row">
-            {% for item in dataset.related %}
-            <div class="col-sm-3">
-              <div class="element">
+        <!-- Similar datasets -->
+        {% if dataset.related %}
+          <h2 class="section-title">Similar Datasets</h2>
+          <section class="similar-datasets">
+            <div class="row">
+              {% for item in dataset.related %}
+              <div class="col-sm-3">
+                <div class="element">
 
-                <h4>{{item.title}}</h4>
+                  <h4>{{item.title}}</h4>
 
-                <div class="bottom">
-                   <div class="content">
-                     {% if item.publisher %}
-                     <p class="pull-left"><i class="far fa-user"></i> <a href="/{{item.publisher}}" class="secondary">{{item.publisher}}</a></p><br />
-                     {% endif %}
-                     {% if item.formats %}
-                     <p class="pull-left"><i class="far fa-file-alt"></i> {{ item.formats | join(',') }}</p><br />
-                     {% endif %}
-                     <p class="pull-left"><a href="{{item.path}}" class="pull-right">View &rsaquo;</a></p>
-                   </div>
-                   <p></p>
+                  <div class="bottom">
+                     <div class="content">
+                       {% if item.publisher %}
+                       <p class="pull-left"><i class="far fa-user"></i> <a href="/{{item.publisher}}" class="secondary">{{item.publisher}}</a></p><br />
+                       {% endif %}
+                       {% if item.formats %}
+                       <p class="pull-left"><i class="far fa-file-alt"></i> {{ item.formats | join(',') }}</p><br />
+                       {% endif %}
+                       <p class="pull-left"><a href="{{item.path}}" class="pull-right">View &rsaquo;</a></p>
+                     </div>
+                     <p></p>
+                  </div>
                 </div>
               </div>
+              {% endfor %}
             </div>
-            {% endfor %}
+          </section>
+
+        {% endif %}
+        <!-- End of Similar datasets -->
+
+
+        <!-- Search -->
+        <section class="similar-search hidden-xs hidden-sm">
+          <div class="row">
+              <div class="col-sm-1">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/icon-search.png" class="img-responsive"/>
+                  </div>
+              </div>
+              <div class="col-sm-6">
+                <h3>Not found what you're looking for?</h3>
+                <p>You can search over a thousand datasets on datahub</p>
+              </div>
+              <div class="col-sm-5">
+                  <!-- searchbox -->
+                  <form class="search-form form form-inline" class="input-group col-xs-12" action="/search" method="GET">
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control input-lg" placeholder="Search ..." name="q" required />
+                    </div>
+                    <div class="col-sm-3">
+                      <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+
+                  </form>
+                  <!-- search box ended -->
+              </div>
           </div>
         </section>
+        <!-- end of search -->
 
-      {% endif %}
-      <!-- End of Similar datasets -->
-
-
-      <!-- Search -->
-      <section class="similar-search hidden-xs hidden-sm">
-        <div class="row">
-            <div class="col-sm-1">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/icon-search.png" class="img-responsive"/>
-                </div>
-            </div>
-            <div class="col-sm-6">
-              <h3>Not found what you're looking for?</h3>
-              <p>You can search over a thousand datasets on datahub</p>
-            </div>
-            <div class="col-sm-5">
-                <!-- searchbox -->
-                <form class="search-form form form-inline" class="input-group col-xs-12" action="/search" method="GET">
-                  <div class="col-sm-9">
-                    <input type="text" class="form-control input-lg" placeholder="Search ..." name="q" required />
-                  </div>
-                  <div class="col-sm-3">
-                    <button class="btn btn-primary" type="submit">Search</button>
-                  </div>
-      
-                </form>
-                <!-- search box ended -->
-            </div>
-        </div>
-      </section>
-      <!-- end of search -->
-
+      </div>
     </div>
   </div>
-</div>
 
-<!-- import into your tool section -->
-<div class="section-gray">
+  <!-- import into your tool section -->
+  <div class="section-gray">
+    <div class="container">
+      <div class="inner_container">
+        <div class="dataset show">
+          <h2 class="section-title">Integrate this dataset into your favourite tool</h2>
+          <ul class="nav nav-pills">
+            <li class="active"><a data-toggle="pill" href="#data-cli">data-cli</a></li>
+            <li><a data-toggle="pill" href="#curl">cURL</a></li>
+            <li><a data-toggle="pill" href="#r">R</a></li>
+            <li><a data-toggle="pill" href="#pandas">Pandas</a></li>
+            <li><a data-toggle="pill" href="#python">Python</a></li>
+            <li><a data-toggle="pill" href="#javascript">JavaScript</a></li>
+          </ul>
+          <!-- content for instructions -->
+          <div class="tab-content">
+
+            <div id="data-cli" class="tab-pane fade in active">
+              <div class="part">
+                {{instructions.data_cli(dataset)}}
+              </div>
+            </div>
+
+            <div id="curl" class="tab-pane fade">
+              <div class="part">
+                {{instructions.curl(dataset)}}
+              </div>
+            </div>
+
+            <div id="r" class="tab-pane fade">
+              <div class="part">
+                {{instructions.r(dataset)}}
+              </div>
+            </div>
+
+            <div id="pandas" class="tab-pane fade">
+              <div class="part">
+                {{instructions.pandas(dataset)}}
+              </div>
+            </div>
+
+            <div id="python" class="tab-pane fade">
+              <div class="part">
+                {{instructions.python(dataset)}}
+              </div>
+            </div>
+
+            <div id="javascript" class="tab-pane fade">
+              <div class="part">
+                {{instructions.javascript(dataset)}}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end of import into your tool section -->
+
+  <!-- readme section -->
+  {% if dataset.readmeSnippet or dataset.readmeHtml %}
   <div class="container">
     <div class="inner_container">
       <div class="dataset show">
-        <h2 class="section-title">Integrate this dataset into your favourite tool</h2>
-        <ul class="nav nav-pills">
-          <li class="active"><a data-toggle="pill" href="#data-cli">data-cli</a></li>
-          <li><a data-toggle="pill" href="#curl">cURL</a></li>
-          <li><a data-toggle="pill" href="#r">R</a></li>
-          <li><a data-toggle="pill" href="#pandas">Pandas</a></li>
-          <li><a data-toggle="pill" href="#python">Python</a></li>
-          <li><a data-toggle="pill" href="#javascript">JavaScript</a></li>
-        </ul>
-        <!-- content for instructions -->
-        <div class="tab-content">
-
-          <div id="data-cli" class="tab-pane fade in active">
-            <div class="part">
-              {{instructions.data_cli(dataset)}}
-            </div>
-          </div>
-
-          <div id="curl" class="tab-pane fade">
-            <div class="part">
-              {{instructions.curl(dataset)}}
-            </div>
-          </div>
-
-          <div id="r" class="tab-pane fade">
-            <div class="part">
-              {{instructions.r(dataset)}}
-            </div>
-          </div>
-
-          <div id="pandas" class="tab-pane fade">
-            <div class="part">
-              {{instructions.pandas(dataset)}}
-            </div>
-          </div>
-
-          <div id="python" class="tab-pane fade">
-            <div class="part">
-              {{instructions.python(dataset)}}
-            </div>
-          </div>
-
-          <div id="javascript" class="tab-pane fade">
-            <div class="part">
-              {{instructions.javascript(dataset)}}
-            </div>
-          </div>
-
-        </div>
+        <h2 id="readme" class="section-title">Read me</h2>
+        <div class="readme part readable-width">{{dataset.readmeHtml|safe}}</div>
       </div>
     </div>
   </div>
-</div><!-- end of import into your tool section -->
-
-<!-- readme section -->
-{% if dataset.readmeSnippet or dataset.readmeHtml %}
-<div class="container">
-  <div class="inner_container">
-    <div class="dataset show">
-      <h2 id="readme" class="section-title">Read me</h2>
-      <div class="readme part readable-width">{{dataset.readmeHtml|safe}}</div>
+  {% elif dataset.description %}
+  <div class="container">
+    <div class="inner_container">
+      <div class="dataset show">
+        <h2 id="readme" class="section-title">Read me</h2>
+        <div class="readme part readable-width">{{dataset.description}}</div>
+      </div>
     </div>
   </div>
-</div>
-{% elif dataset.description %}
-<div class="container">
-  <div class="inner_container">
-    <div class="dataset show">
-      <h2 id="readme" class="section-title">Read me</h2>
-      <div class="readme part readable-width">{{dataset.description}}</div>
+  {% endif %}<!-- end of readme section -->
+
+
+  <!-- Link to datapackage.json - putting here to be hidden for now -->
+  <div class="container">
+    <div class="inner_container">
+      <a href="/{{ owner }}/{{ dataset.name }}/datapackage.json{{ '?v='+revisionId if revisionId }}" class="btn btn-default" style="margin-top:-80px">Datapackage.json</a>
     </div>
-  </div>
-</div>
-{% endif %}<!-- end of readme section -->
+  </div><!-- end of link to datapackage.json -->
 
+  {% if owner|lower == 'core' or owner|lower == 'sports-data' or owner|lower == 'machine-learning' or owner|lower == 'cryptocurrency' or owner|lower == 's-and-p-500-financial-data' or owner|lower == 'world-bank' or owner|lower == 'unece' %}
+  <div class="container premium_dataoffer">
+    <div class="inner_container">
+      <div class="row">
+          <div class="col-sm-12">
+              <h3>Request Customized Data</h3>
+              <br/>
+          </div>
+      </div>
 
-<!-- Link to datapackage.json - putting here to be hidden for now -->
-<div class="container">
-  <div class="inner_container">
-    <a href="/{{ owner }}/{{ dataset.name }}/datapackage.json{{ '?v='+revisionId if revisionId }}" class="btn btn-default" style="margin-top:-80px">Datapackage.json</a>
-  </div>
-</div><!-- end of link to datapackage.json -->
+      <div class="row">
+          <div class="col-md-4 col-sm-6">
+              <div class="card">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/data-offer-icon-1.png" class="img-responsive"/>
+                  </div>
+                  <p>Notifications of data updates and schema changes</p>
+              </div>
+              <p class="clearfix"></p>
+          </div>
 
-{% if owner|lower == 'core' or owner|lower == 'sports-data' or owner|lower == 'machine-learning' or owner|lower == 'cryptocurrency' or owner|lower == 's-and-p-500-financial-data' or owner|lower == 'world-bank' or owner|lower == 'unece' %}
-<div class="container premium_dataoffer">
-  <div class="inner_container">
-    <div class="row">
+          <div class="col-md-4 col-sm-6">
+              <div class="card">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/data-offer-icon-2.png" class="img-responsive"/>
+                  </div>
+                  <p>Warranty / guaranteed updates</p>
+              </div>
+              <p class="clearfix"></p>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+              <div class="card">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/data-offer-icon-3.png" class="img-responsive"/>
+                  </div>
+                  <p>Workflow integration (e.g. Python packages, NPM packages)</p>
+              </div>
+              <p class="clearfix"></p>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+              <div class="card">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/data-offer-icon-4.png" class="img-responsive"/>
+                  </div>
+                  <p>Customized data (e.g. you need different or additional data)</p>
+              </div>
+              <p class="clearfix"></p>
+          </div>
+
+          <div class="col-md-4 col-sm-6">
+              <div class="card">
+                  <div class="icon pull-left shadow">
+                      <img src="/static/img/data-offer-icon-5.png" class="img-responsive"/>
+                  </div>
+                  <p>Or suggest your own feature from the link below</p>
+              </div>
+              <p class="clearfix"></p>
+          </div>
+      </div>
+      <div class="row">
         <div class="col-sm-12">
-            <h3>Request Customized Data</h3>
-            <br/>
+            <a href="#premium-data-3" data-toggle="modal" data-target="#premium-data" class="btn btn-primary premium-data-link" onclick="dataLayer.push({'premium-data-link': 'separate-section'})">Try It Now</a> <br/>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-4 col-sm-6">
-            <div class="card">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/data-offer-icon-1.png" class="img-responsive"/>
-                </div>
-                <p>Notifications of data updates and schema changes</p>
-            </div>
-            <p class="clearfix"></p>
-        </div>
-
-        <div class="col-md-4 col-sm-6">
-            <div class="card">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/data-offer-icon-2.png" class="img-responsive"/>
-                </div>
-                <p>Warranty / guaranteed updates</p>
-            </div>
-            <p class="clearfix"></p>
-        </div>
-
-        <div class="col-md-4 col-sm-6">
-            <div class="card">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/data-offer-icon-3.png" class="img-responsive"/>
-                </div>
-                <p>Workflow integration (e.g. Python packages, NPM packages)</p>
-            </div>
-            <p class="clearfix"></p>
-        </div>
-
-        <div class="col-md-4 col-sm-6">
-            <div class="card">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/data-offer-icon-4.png" class="img-responsive"/>
-                </div>
-                <p>Customized data (e.g. you need different or additional data)</p>
-            </div>
-            <p class="clearfix"></p>
-        </div>
-
-        <div class="col-md-4 col-sm-6">
-            <div class="card">
-                <div class="icon pull-left shadow">
-                    <img src="/static/img/data-offer-icon-5.png" class="img-responsive"/>
-                </div>
-                <p>Or suggest your own feature from the link below</p>
-            </div>
-            <p class="clearfix"></p>
-        </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-12">
-          <a href="#premium-data-3" data-toggle="modal" data-target="#premium-data" class="btn btn-primary premium-data-link" onclick="dataLayer.push({'premium-data-link': 'separate-section'})">Try It Now</a> <br/>
       </div>
     </div>
   </div>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}
 
 
