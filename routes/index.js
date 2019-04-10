@@ -156,15 +156,22 @@ module.exports = function () {
   ], redirectToDest('/tools'))
 
   router.get('/api-guides', redirectToDest('/guide/api'))
+  router.get('/simple-guides', redirectToDest('/guide/simple'))
 
   // EDS specific:
-  router.get(['/guide/:page', '/news/:page'], showStaticPage)
+  router.get(['/about', '/guide/:page', '/news/:page'], showStaticPage)
 
   async function showStaticPage(req, res) {
     const BASE = 'https://gitlab.com/api/v4/projects/11775540/repository/files/'
     const appendix = '/raw?ref=master'
     const directory = req.originalUrl.split('/')[1]
-    const path = `${directory}%2F${req.params.page}.md`
+    let path
+    if (req.params.page) {
+      path = `${directory}%2F${req.params.page}.md`
+    } else {
+      // Pages like 'about' are in root dir of the repo:
+      path = `${directory}.md`
+    }
     //request raw page from gitlab private repo
     let gitpath = BASE + path + appendix
     const resp = await fetch(gitpath, {
