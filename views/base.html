@@ -4,24 +4,22 @@
   <meta charset="utf-8">
   <title>
     {% block title%}{{title}}{% endblock %}
-    - DataHub - Frictionless Data
+    - ENERGI DATA SERVICE
   </title>
-  <meta name="author" content="Datopian">
-  <meta name="keywords" content="{{keywords or 'data,open data,datasets,datahub,data hub,public data,data package,reference data,csv,json,excel'}}">
+  <meta name="author" content="Energinet">
+  <meta name="keywords" content="{{keywords or 'energinet,eds,data,open data,datasets,public data,csv,json,excel,xml'}}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <!-- Twitter card -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="@datahubio" />
   <meta name="twitter:title" content="{{dataset.title or title}}" />
-  <meta name="twitter:image" content="{{metaImage or 'https://datahub.io/static/img/logo-cube.png'}}" />
+  <meta name="twitter:image" content="{{metaImage or '/static/img/ckan-logo.png'}}" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="{{dataset.title or title}}" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="DataHub" />
-  <meta property="og:image" content="{{metaImage or 'https://datahub.io/static/img/logo-cube.png'}}" />
-  <meta property="og:image:alt" content="DataHub" />
-  <meta property="fb:app_id" content="188583668435715" />
+  <meta property="og:site_name" content="Energinet" />
+  <meta property="og:image" content="{{metaImage or '/static/img/ckan-logo.png'}}" />
+  <meta property="og:image:alt" content="Energinet" />
 
   {% if metaDescription %}
   <meta name="description" content="{{metaDescription}}" />
@@ -32,30 +30,16 @@
   <meta name="twitter:description" content="{{dataset.description or dataset.readmeSnippet or dataset.readmeHtml|safe}}" />
   <meta property="og:description" content="{{dataset.description or dataset.readmeSnippet or dataset.readmeHtml|safe}}" />
   {% else %}
-  <meta name="description" content="{{description or 'Find, Share and Publish Quality Data Online. The fastest way for individuals, teams and organizations to publish, deploy and share their data.'}}">
-  <meta name="twitter:description" content="{{description or 'Find, Share and Publish Quality Data Online. The fastest way for individuals, teams and organizations to publish, deploy and share their data.'}}" />
-  <meta property="og:description" content="{{description or 'Find, Share and Publish Quality Data Online. The fastest way for individuals, teams and organizations to publish, deploy and share their data.'}}" />
+  <meta name="description" content="{{description or 'Open energy data from Energinet to society'}}">
+  <meta name="twitter:description" content="{{description or 'Open energy data from Energinet to society'}}" />
+  <meta property="og:description" content="{{description or 'Open energy data from Energinet to society'}}" />
   {% endif %}
 
+  <link rel="apple-touch-icon" href="/static/img/energi-data-service-favicon-180.png" sizes="180x180">
+  <link rel="icon" href="/static/img/energi-data-service-favicon-192.png" type="image/png" sizes="192x192">
+  <link rel="shortcut icon" href="/static/img/energi-data-service-favicon-512.png" type="image/png" sizes="512x512">
 
-  <link rel="icon" type="img/ico" href="/static/img/favicon.ico" sizes="16x16">
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-WCTXGJ8');</script>
-  <!-- End Google Tag Manager -->
-  <!-- Minimize page flickering -->
-  <style>.async-hide { opacity: 0 !important} </style>
-  <script>(function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;h.start=1*new Date;
-  h.end=i=function(){s.className=s.className.replace(RegExp(' ?'+y),'')};
-  (a[n]=a[n]||[]).hide=h;setTimeout(function(){i();h.end=null},c);h.timeout=c;
-  })(window,document.documentElement,'async-hide','dataLayer',1000,
-  {'GTM-WCTXGJ8':true});</script>
-  <!-- End Minimize page flickering -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-
 
   <link rel="stylesheet" media="screen" href="/static/stylesheets/app.css">
   {% if dataset %}
@@ -65,13 +49,6 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body class="{% block bodyclass %}{{bodyclass}}{% endblock %}">
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCTXGJ8"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-    <div class="banner" style="margin-bottom:0">
-      <div><span style="font-weight:600"><i class="fas fa-bullhorn" aria-hidden="true"></i> We need your feedback, please fill in our <a href="https://goo.gl/forms/e33WTi9Tebph00z53" target="_blank">2 minute survey!</a></span> This is the rebooted DataHub &ndash; <a href="https://github.com/datahq/datahub-qa" style="color:black;text-decoration:underline;">please report issues here</a>.</div>
-    </div>
     <!-- Page header -->
     <div class="navbar navbar-default">
       <div class="container">
@@ -261,10 +238,10 @@
 
 
   {% block scripts %}{% endblock %}
-	
+
 	<script src="/static/js/emojify.js"></script>
     <script type="text/javascript" src="/static/js/smoothscroll.min.js"></script>
-	
+
     <script>
       // Emojify text:
       emojify.setConfig({
@@ -285,9 +262,6 @@
         if (parts.length == 2) return parts.pop().split(";").shift();
       }
 
-      // Set the userid for Google Tags Manager:
-      dataLayer.push({'userId': getCookie('id')});
-
       function scrollDown(el) {
         document.querySelector(el.attributes.href.value).scrollIntoView({
           behavior: 'smooth'
@@ -302,8 +276,8 @@
         });
 
         $('.certified-tick').attr('data-original-title','<b>Datahub Certified</b> <ul><li>&#x25CF; Quality assured data </li><li>&#x25CF; Sources audited </li><li>&#x25CF; Premium data available for bespoke formatting, additional data and guaranteed updates with SLA</li></ul>');
-        $('[data-toggle="tooltip"]').tooltip({html:true}); 
-        
+        $('[data-toggle="tooltip"]').tooltip({html:true});
+
       });
       // Set avatar in navbar using id in cookies
       var src = `https://www.gravatar.com/avatar/${getCookie('id')}?d=https%3A%2F%2Ftesting.datahub.io%2Fstatic%2Fimg%2Flogo-cube03.png`;
