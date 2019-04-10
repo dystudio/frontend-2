@@ -435,7 +435,6 @@ module.exports = function () {
         }
         normalizedDp.views.push(view)
       })
-      console.log(normalizedDp.views)
 
       renderPage(normalizedDp)
 
