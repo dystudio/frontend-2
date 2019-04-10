@@ -13,9 +13,11 @@
         <h1>
           {{title}}
         </h1>
-        <p class="meta-info">
-          <i class="fas fa-calendar" aria-hidden="true"></i> Last modified: {{modified}}
-        </p>
+        {% if modified %}
+          <p class="meta-info">
+            <i class="fas fa-calendar" aria-hidden="true"></i> Last modified: {{modified}}
+          </p>
+        {% endif %}
       </div>
       <div class="row">
         <div class="col-md-8 col-md-offset-2">

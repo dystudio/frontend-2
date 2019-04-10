@@ -184,7 +184,7 @@ module.exports = function () {
     res.render('static.html', {
       title: parsedWithFrontMatter.attributes.title,
       content: utils.md.render(parsedWithFrontMatter.body),
-      modified: modified ? moment(modified).format('MMMM Do, YYYY') : 'N/A',
+      modified: modified ? moment(modified).format('MMMM Do, YYYY') : '',
     })
   }
 
