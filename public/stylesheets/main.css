@@ -6777,7 +6777,7 @@ a.tag:hover {
   top: 2px;
   width: 16px;
   height: 16px;
-  background-image: url("/base/images/sprite-ckan-icons.png");
+  background-image: url("/static/img/sprite-ckan-icons.png");
   background-repeat: no-repeat;
   background-position: 16px 16px;
   content: "";
@@ -6848,7 +6848,7 @@ a.tag:hover {
   top: 2px;
   width: 16px;
   height: 16px;
-  background-image: url("/base/images/sprite-ckan-icons.png");
+  background-image: url("/static/img/sprite-ckan-icons.png");
   background-repeat: no-repeat;
   background-position: 16px 16px;
   width: 17px;
@@ -7544,7 +7544,7 @@ fieldset[disabled] .control-custom.disabled .checkbox.btn.focus {
 }
 .resource-upload-field.loading {
   display: inline-block;
-  background: url("/base/images/loading-spinner.gif") no-repeat center right;
+  background: url("/static/img/loading-spinner.gif") no-repeat center right;
   padding-right: 5px;
 }
 .select2-container .select2-choice input,
@@ -8489,7 +8489,7 @@ h1, h2, h3, h4 {
   top: 2px;
   width: 16px;
   height: 16px;
-  background-image: url("/base/images/sprite-ckan-icons.png");
+  background-image: url("/static/img/sprite-ckan-icons.png");
   background-repeat: no-repeat;
   background-position: 16px 16px;
 }
@@ -8677,11 +8677,11 @@ h1, h2, h3, h4 {
   top: 2px;
   width: 16px;
   height: 16px;
-  background-image: url("/base/images/sprite-ckan-icons.png");
+  background-image: url("/static/img/sprite-ckan-icons.png");
   background-repeat: no-repeat;
   background-position: 16px 16px;
   text-indent: -900em;
-  background: url("/base/images/sprite-resource-icons.png") no-repeat 0 0;
+  background: url("/static/img/sprite-resource-icons.png") no-repeat 0 0;
 }
 .format-label {
   width: 32px;
@@ -9654,7 +9654,7 @@ h1, h2, h3, h4 {
   width: 68px;
   height: 21px;
   margin-top: 2px;
-  background: url("/base/images/ckan-logo-footer.png") no-repeat top left;
+  background: url("/static/img/ckan-logo-footer.png") no-repeat top left;
   text-indent: -900em;
 }
 .lang-select:before,
@@ -9726,7 +9726,7 @@ h1, h2, h3, h4 {
 .js .table-toggle-more .toggle-seperator td {
   height: 11px;
   padding: 0;
-  background-image: url("/base/images/table-seperator.png");
+  background-image: url("/static/img/table-seperator.png");
 }
 .js .table .toggle-show td {
   background: none;
@@ -9760,7 +9760,7 @@ h1, h2, h3, h4 {
   margin: 15px 10px;
   padding: 0;
   list-style-type: none;
-  background: transparent url('/base/images/dotted.png') 14px 0 repeat-y;
+  background: transparent url('/static/img/dotted.png') 14px 0 repeat-y;
 }
 .activity .item {
   position: relative;
@@ -10014,7 +10014,7 @@ h1, h2, h3, h4 {
   right: -10px;
   width: 10px;
   height: 21px;
-  background: transparent url("/base/images/dashboard-followee-related.png");
+  background: transparent url("/static/img/dashboard-followee-related.png");
 }
 .popover-followee .popover-title {
   display: none;
@@ -10159,7 +10159,7 @@ h1, h2, h3, h4 {
   text-align: center;
   font-weight: 300;
   color: #fff;
-  background: #097E82 url("/base/images/eds-banner.png") center no-repeat;
+  background: #097E82 url("/static/img/eds-banner.png") center no-repeat;
   background-size: cover;
 }
 .banner-flex-center {
