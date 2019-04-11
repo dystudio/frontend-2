@@ -57,12 +57,12 @@
           <div class="col-lg-3 col-md-2">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
+                <span class="sr-only">{{__('Toggle navigation')}}</span>
                 <i class="fa fa-reorder"></i>
               </button>
 
               <div class="header-image">
-                <a class="" href="/"><img src="/static/img/ckan-logo.png" alt="Welcome to Energi Data Service" title="Welcome to Energi Data Service"></a>
+                <a class="" href="/"><img src="/static/img/ckan-logo.png" alt="{{__('Welcome to Energi Data Service')}}" title="{{__('Welcome to Energi Data Service')}}"></a>
               </div>
             </div>
 
@@ -71,8 +71,8 @@
 
             <form class="navbar-form section site-search simple-input" action="/dataset" method="get">
               <div class="field">
-                <label for="field-sitewide-search">Search Datasets</label>
-                <input id="field-sitewide-search" class="form-control" type="text" name="q" placeholder="Search datasets">
+                <label for="field-sitewide-search">{{__('Search Datasets')}}</label>
+                <input id="field-sitewide-search" class="form-control" type="text" name="q" placeholder="{{__('Search datasets')}}">
                 <button class="btn-search" type="submit"><i class="fa fa-search"></i></button>
               </div>
             </form>
@@ -83,16 +83,16 @@
               <nav class="navigation">
                 <ul class="nav navbar-nav nav-pills">
 
-                  <li><a href="/dataset">Datasets</a></li><li><a href="/organization">Organizations</a></li><li><a href="/group">Groups</a></li><li><a href="/about">About</a></li>
+                  <li><a href="/dataset">{{__('Datasets')}}</a></li><li><a href="/organization">{{__('Organizations')}}</a></li><li><a href="/group">{{__('Groups')}}</a></li><li><a href="/about">{{__('About')}}</a></li>
 
                   <li>
-                    <a href="" data-toggle="dropdown">Guides<span class="caret"></span></a>
+                    <a href="" data-toggle="dropdown">{{__('Guides')}}<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                       <li>
-                        <a href="/api-guides">API Guides</a>
+                        <a href="/api-guides">{{__('API Guides')}}</a>
                       </li>
                       <li>
-                        <a href="/simple-guides">Simple Guides</a>
+                        <a href="/simple-guides">{{__('Simple Guides')}}</a>
                       </li>
                     </ul>
                   </li>
@@ -131,7 +131,7 @@
           <div class="col-md-4">
             <a href="http://energinet.dk/" target="blank"><img class="footer-logo" src="/static/img/energinet-logo.svg" width="160" height="40" alt="Energinet logo"></a>
             <p>
-                Energinet has a lot of energy data and through Energi Data Service, we want to make these data available. The portal will be expanded regularly. We hope you will join us on the journey, and will contribute with advice and feedback.
+                {{__('Energinet has a lot of energy data and through Energi Data Service, we want to make these data available. The portal will be expanded regularly. We hope you will join us on the journey, and will contribute with advice and feedback.')}}
             </p>
           </div>
           <div class="col-md-4 footer-links footer-border">
