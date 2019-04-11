@@ -101,10 +101,8 @@
 
 
               <ul class="language-switcher">
-
-
-                <li class="active"><a data-language="en" data-language-name="English" href="/en/">EN</a></li>
-                <li><a data-language="da_DK" data-language-name="Danish" href="/da_DK/">DK</a></li>
+                <li onclick="languageSwitcher(this)"><a data-language="en" data-language-name="English" href="#">EN</a></li>
+                <li onclick="languageSwitcher(this)"><a data-language="da" data-language-name="Danish" href="#">DK</a></li>
               </ul>
 
             </div>
@@ -181,6 +179,15 @@
   <script type="text/javascript" src="/static/js/smoothscroll.min.js"></script>
 
   <script>
+    // Switch languages:
+    function languageSwitcher(el) {
+      if (el.className != 'active') {
+        var language = el.getElementsByTagName('a')[0].dataset.language;
+        document.cookie = 'defaultLocale=' + language;
+        location.reload();
+      }
+    }
+
     // Emojify text:
     emojify.setConfig({
       only_crawl_id    : null,            // Use to restrict where emojify.js applies

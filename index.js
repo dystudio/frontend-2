@@ -8,11 +8,18 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
+const i18n = require("i18n")
 
 const config = require('./config')
 const routes = require('./routes')
 
 module.exports.makeApp = function () {
+  i18n.configure({
+    locales: ['en', 'da'],
+    cookie: 'defaultLocale',
+    directory: __dirname+'/locales'
+  })
+
   const app = express()
   app.set('config', config)
   app.set('port', config.get('app:port'))
@@ -27,6 +34,7 @@ module.exports.makeApp = function () {
   )
   app.use(cors())
   app.use(cookieParser())
+  app.use(i18n.init)
   app.use(session({ secret: 'keyboard cat', cookie: { maxAge: 60000 }}))
   app.use(flash())
   // Check if looged in and set locals for nunjucks
