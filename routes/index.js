@@ -166,11 +166,12 @@ module.exports = function () {
     const appendix = '/raw?ref=master'
     const directory = req.originalUrl.split('/')[1]
     let path
+    let locale = req.getLocale()
     if (req.params.page) {
-      path = `${directory}%2F${req.params.page}.md`
+      path = `${locale}%2F${directory}%2F${req.params.page}.md`
     } else {
       // Pages like 'about' are in root dir of the repo:
-      path = `${directory}.md`
+      path = `${locale}%2F${directory}.md`
     }
     //request raw page from gitlab private repo
     let gitpath = BASE + path + appendix
