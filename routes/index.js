@@ -189,6 +189,22 @@ module.exports = function () {
     })
   }
 
+  router.get('/dataset', async (req, res, next) => {
+    // Get the list of datasets:
+    const apiPath = 'http://127.0.0.1:5000/api/3/action/current_package_list_with_resources'
+    const response = await fetch(apiPath)
+    if (response.status === 200) {
+      const packages = await response.json()
+      packages.summary = {total: 34}
+      res.render('search.html', {
+        title: 'Search Datasets',
+        description: 'Search for public datasets. Quickly find data in various formats: csv, json, excel and more.',
+        packages,
+        defaultSearch: false
+      })
+    }
+  })
+
   router.get('/dashboard', async (req, res, next) => {
     if (req.cookies.jwt) {
       const isAuthenticated = await api.authenticate(req.cookies.jwt)
