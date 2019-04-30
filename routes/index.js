@@ -339,7 +339,7 @@ module.exports = function () {
    * return pages from the awesome github repo:
    * https://github.com/datahubio/awesome
    */
-  router.get('/awesome',redirectToDest("/collections"))
+  router.get(['/awesome', '/group'],redirectToDest("/collections"))
   router.get('/collections', (req, res) => {
     res.render('awesome-home.html', {
       title: 'Dataset Collections',
