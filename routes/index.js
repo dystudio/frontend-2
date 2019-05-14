@@ -170,7 +170,7 @@ module.exports = function () {
       method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
     })
     const files = await resp.json()
-    const posts = await Promise.all(files.map(async file => {
+    let posts = await Promise.all(files.map(async file => {
       let item = {
         title: '',
         date: '',
@@ -185,10 +185,19 @@ module.exports = function () {
       // parse the raw .md page and render it with a template.
       const parsedWithFrontMatter = fm(text)
       item.title = parsedWithFrontMatter.attributes.title
-      item.date = moment(parsedWithFrontMatter.attributes.date).format('MMMM Do, YYYY')
+      item.date = parsedWithFrontMatter.attributes.date
       item.preview = utils.md.render(parsedWithFrontMatter.body).substring(0, 200)
       return item
     }))
+    // Sort posts by date in descending order:
+    posts.sort(function(a,b){
+      return new Date(b.date) - new Date(a.date)
+    })
+    // Dates in human readable format:
+    posts = posts.map(post => {
+      post.date = moment(post.date).format('MMMM Do, YYYY')
+      return post
+    })
     res.render('blog.html', {
       title: req.originalUrl.substring(1),
       description: 'Energinet ' + req.originalUrl.substring(1),
