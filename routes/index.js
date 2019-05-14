@@ -159,6 +159,43 @@ module.exports = function () {
   router.get('/simple-guides', redirectToDest('/guide/simple'))
 
   // EDS specific:
+  router.get(['/news', '/guide'], listStaticPages)
+
+  async function listStaticPages(req, res) {
+    const BASE = 'https://gitlab.com/api/v4/projects/11775540/repository/'
+    const locale = req.getLocale()
+    const path = 'tree?path=' + locale + req.originalUrl
+    let gitpath = BASE + path
+    let resp = await fetch(gitpath, {
+      method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
+    })
+    const files = await resp.json()
+    const posts = await Promise.all(files.map(async file => {
+      let item = {
+        title: '',
+        date: '',
+        preview: '',
+        path: file.path.replace(/en|da/, '').replace('.md', '')
+      }
+      gitpath = BASE + 'files/' + file.path.replace(/\//g, '%2F') + '/raw?ref=master'
+      resp = await fetch(gitpath, {
+        method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
+      })
+      const text = await resp.text()
+      // parse the raw .md page and render it with a template.
+      const parsedWithFrontMatter = fm(text)
+      item.title = parsedWithFrontMatter.attributes.title
+      item.date = moment(parsedWithFrontMatter.attributes.date).format('MMMM Do, YYYY')
+      item.preview = utils.md.render(parsedWithFrontMatter.body).substring(0, 200)
+      return item
+    }))
+    res.render('blog.html', {
+      title: req.originalUrl.substring(1),
+      description: 'Energinet ' + req.originalUrl.substring(1),
+      posts
+    })
+  }
+
   router.get(['/about', '/guide/:page', '/news/:page'], showStaticPage)
 
   async function showStaticPage(req, res) {

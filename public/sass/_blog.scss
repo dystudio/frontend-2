@@ -1,4 +1,10 @@
 body.blog {
+  section.blog-page {
+    background-color: white;
+  }
+  .subscribe-form {
+    padding-bottom: 16px; 
+  }
   table {
     @extend .table;
     @extend .table-striped;
