@@ -173,7 +173,7 @@ module.exports = function () {
     let posts = await Promise.all(files.map(async file => {
       let item = {
         title: '',
-        date: '',
+        published: '',
         preview: '',
         path: file.path.replace(/en|da/, '').replace('.md', '')
       }
@@ -185,17 +185,17 @@ module.exports = function () {
       // parse the raw .md page and render it with a template.
       const parsedWithFrontMatter = fm(text)
       item.title = parsedWithFrontMatter.attributes.title
-      item.date = parsedWithFrontMatter.attributes.date
+      item.published = parsedWithFrontMatter.attributes.published
       item.preview = utils.md.render(parsedWithFrontMatter.body).substring(0, 200)
       return item
     }))
     // Sort posts by date in descending order:
     posts.sort(function(a,b){
-      return new Date(b.date) - new Date(a.date)
+      return new Date(b.published) - new Date(a.published)
     })
     // Dates in human readable format:
     posts = posts.map(post => {
-      post.date = moment(post.date).format('MMMM Do, YYYY')
+      post.published = moment(post.published).format('MMMM Do, YYYY')
       return post
     })
     res.render('blog.html', {
@@ -227,10 +227,12 @@ module.exports = function () {
     const text = await resp.text()
     // parse the raw .md page and render it with a template.
     const parsedWithFrontMatter = fm(text)
+    const published = parsedWithFrontMatter.attributes.published
     const modified = parsedWithFrontMatter.attributes.modified
     res.render('static.html', {
       title: parsedWithFrontMatter.attributes.title,
       content: utils.md.render(parsedWithFrontMatter.body),
+      published: published ? moment(published).format('MMMM Do, YYYY') : '',
       modified: modified ? moment(modified).format('MMMM Do, YYYY') : '',
     })
   }
