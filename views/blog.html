@@ -12,14 +12,14 @@
     <div class="inner_container">
       {% for post in posts %}
       <div class="post">
-        <a href="{{post.path}}">
+        <a href="/news/{{post.slug}}">
           <h2>{{post.title}}</h2>
         </a>
         <p class="meta">
-          <i class="fa fa-calendar-o" aria-hidden="true"></i> {{post.published}}
+          <i class="fa fa-calendar-o" aria-hidden="true"></i> {{post.modified}}
         </p>
-        {{post.preview | safe}}
-        <p><a href="{{post.path}}">Read more</a></p>
+        {{post.content | safe | truncate(100)}}
+        <p><a href="/news/{{post.slug}}">Read more</a></p>
       </div>
 
       {% endfor %}

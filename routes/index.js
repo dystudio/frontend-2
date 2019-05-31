@@ -15,6 +15,7 @@ const timeago = require('timeago.js')
 const puppeteer = require('puppeteer')
 const mcache = require('memory-cache')
 const slash = require('slash')
+const wpcom = require('wpcom')()
 
 var stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const ua = require('universal-analytics')
@@ -162,78 +163,30 @@ module.exports = function () {
   router.get(['/news', '/guide'], listStaticPages)
 
   async function listStaticPages(req, res) {
-    const BASE = 'https://gitlab.com/api/v4/projects/11775540/repository/'
-    const locale = req.getLocale()
-    const path = 'tree?path=' + locale + req.originalUrl
-    let gitpath = BASE + path
-    let resp = await fetch(gitpath, {
-      method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
-    })
-    const files = await resp.json()
-    let posts = await Promise.all(files.map(async file => {
-      let item = {
-        title: '',
-        published: '',
-        preview: '',
-        path: file.path.replace(/en|da/, '').replace('.md', '')
-      }
-      gitpath = BASE + 'files/' + file.path.replace(/\//g, '%2F') + '/raw?ref=master'
-      resp = await fetch(gitpath, {
-        method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
-      })
-      const text = await resp.text()
-      // parse the raw .md page and render it with a template.
-      const parsedWithFrontMatter = fm(text)
-      item.title = parsedWithFrontMatter.attributes.title
-      item.published = parsedWithFrontMatter.attributes.published
-      item.preview = utils.md.render(parsedWithFrontMatter.body).substring(0, 200)
-      return item
-    }))
-    // Sort posts by date in descending order:
-    posts.sort(function(a,b){
-      return new Date(b.published) - new Date(a.published)
-    })
-    // Dates in human readable format:
-    posts = posts.map(post => {
-      post.published = moment(post.published).format('MMMM Do, YYYY')
-      return post
-    })
+    const blog = wpcom.site('edscms.home.blog')
+    // Get latest 10 blog posts
+    const result = await blog.postsList({number: 10})
     res.render('blog.html', {
-      title: req.originalUrl.substring(1),
-      description: 'Energinet ' + req.originalUrl.substring(1),
-      posts
+      posts: result.posts
     })
   }
 
   router.get(['/about', '/guide/:page', '/news/:page'], showStaticPage)
 
-  async function showStaticPage(req, res) {
-    const BASE = 'https://gitlab.com/api/v4/projects/11775540/repository/files/'
-    const appendix = '/raw?ref=master'
-    const directory = req.originalUrl.split('/')[1]
-    let path
-    let locale = req.getLocale()
-    if (req.params.page) {
-      path = `${locale}%2F${directory}%2F${req.params.page}.md`
-    } else {
-      // Pages like 'about' are in root dir of the repo:
-      path = `${locale}%2F${directory}.md`
-    }
-    //request raw page from gitlab private repo
-    let gitpath = BASE + path + appendix
-    const resp = await fetch(gitpath, {
-      method: 'GET', headers: {'PRIVATE-TOKEN': process.env.GITLAB_READ_TOKEN}
-    })
-    const text = await resp.text()
-    // parse the raw .md page and render it with a template.
-    const parsedWithFrontMatter = fm(text)
-    const published = parsedWithFrontMatter.attributes.published
-    const modified = parsedWithFrontMatter.attributes.modified
-    res.render('static.html', {
-      title: parsedWithFrontMatter.attributes.title,
-      content: utils.md.render(parsedWithFrontMatter.body),
-      published: published ? moment(published).format('MMMM Do, YYYY') : '',
-      modified: modified ? moment(modified).format('MMMM Do, YYYY') : '',
+  async function showStaticPage(req, res, next) {
+    const blog = wpcom.site('edscms.home.blog')
+    // Get the post using slug
+    blog.post({slug: req.params.page}).getBySlug((err, data) => {
+      if (err) {
+        next(err)
+      } else {
+        res.render('static.html', {
+          title: data.title,
+          content: data.content,
+          published: moment(data.date).format('MMMM Do, YYYY'),
+          modified: moment(data.modified).format('MMMM Do, YYYY'),
+        })
+      }
     })
   }
 

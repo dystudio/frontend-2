@@ -73,6 +73,7 @@
     "stripe": "^5.8.0",
     "timeago.js": "^3.0.2",
     "universal-analytics": "^0.4.17",
+    "wpcom": "^5.4.2",
     "xo": "^0.18.2"
   },
   "devDependencies": {
